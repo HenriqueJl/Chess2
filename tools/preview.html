@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Prévia de modelos</title>
+    <style>
+      body { margin: 0; background: #2a2340; color: #fff; font: 14px system-ui; }
+      #labels { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+      canvas { display: block; }
+      #labels div { position: absolute; font-size: 22px; transform: translate(-50%, 0); background: #0008; padding: 2px 6px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div id="labels"></div>
+    <script type="module">
+      // Ferramenta de desenvolvimento: /tools/preview.html?set=dinossauros
+      // Mostra cada peça do .glb lado a lado. A seta vermelha marca a "frente" (+Z).
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
+
+      const set = new URLSearchParams(location.search).get('set') ?? 'dinossauros';
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(innerWidth, innerHeight);
+      document.body.appendChild(renderer.domElement);
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#2a2340');
+      scene.add(new THREE.HemisphereLight('#fff', '#446', 1.5));
+      const sun = new THREE.DirectionalLight('#fff', 2);
+      sun.position.set(3, 5, 6);
+      scene.add(sun);
+      const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 100);
+
+      const gltf = await new GLTFLoader().loadAsync(`/models/${set}.glb`);
+      const meshes = [];
+      gltf.scene.traverse((o) => o.isMesh && meshes.push(o));
+      const cols = Math.min(meshes.length, 6);
+      const mat = new THREE.MeshStandardMaterial({ color: '#e8e2d4', roughness: 0.5 });
+      const labels = [];
+      meshes.forEach((m, i) => {
+        const g = toCreasedNormals(m.geometry, Math.PI / 4);
+        const mesh = new THREE.Mesh(g, mat);
+        const x = (i % cols) * 1.4 - ((cols - 1) * 1.4) / 2;
+        const z = -Math.floor(i / cols) * 2.2;
+        mesh.position.set(x, 0, z);
+        scene.add(mesh);
+        const arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(x, 0.02, z), 0.6, 0xff3333);
+        scene.add(arrow);
+        labels.push({ name: m.name, pos: new THREE.Vector3(x, -0.15, z) });
+      });
+      const rows = Math.ceil(meshes.length / cols);
+      camera.position.set(0, 2.6, 9 + rows * 1.2);
+      camera.lookAt(0, 0.5, -(rows - 1) * 1.1);
+      renderer.setAnimationLoop(() => renderer.render(scene, camera));
+      const box = document.getElementById('labels');
+      for (const l of labels) {
+        const p = l.pos.clone().project(camera);
+        const el = document.createElement('div');
+        el.textContent = l.name;
+        el.style.left = `${((p.x + 1) / 2) * innerWidth}px`;
+        el.style.top = `${((1 - p.y) / 2) * innerHeight}px`;
+        box.appendChild(el);
+      }
+      window.__ready = true;
+    </script>
+  </body>
+</html>

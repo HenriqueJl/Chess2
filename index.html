@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>Xadrez 2</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23ffd34d'/><text x='32' y='47' font-size='40' font-weight='900' text-anchor='middle' font-family='sans-serif' fill='%232a2340'>2</text></svg>"
+    />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <header class="topbar">
+      <div class="brand">♞ Xadrez 2</div>
+      <div id="turn" class="turn" data-color="w"></div>
+      <button id="net-status" class="net" data-state="waiting" hidden title="Detalhes da sala"></button>
+      <nav class="actions">
+        <button id="btn-menu" title="Voltar para a tela de início">Menu</button>
+        <button id="btn-new" title="Começar de novo">Novo jogo</button>
+        <button id="btn-undo" title="Desfazer o último lance">Desfazer</button>
+        <button id="btn-settings" title="Nomes, nível, som...">Ajustes</button>
+      </nav>
+    </header>
+
+    <div id="bubble" class="bubble" role="status" aria-live="polite"></div>
+    <div id="stamp" class="stamp" aria-hidden="true"></div>
+
+    <div id="promotion" class="modal" hidden>
+      <div class="card">
+        <h2 id="promotion-title">O peão chegou lá! Vai virar o quê?</h2>
+        <div class="choices"></div>
+        <button class="cancel">Cancelar</button>
+      </div>
+    </div>
+
+    <section id="start" class="modal start" aria-labelledby="start-title">
+      <div class="start-inner">
+        <h1 id="start-title" class="logo">Xadrez <span class="logo-2">2</span></h1>
+        <p class="tagline">Porque o primeiro era sério demais.</p>
+        <div class="start-buttons">
+          <button id="start-continue" class="big primary" hidden>Continuar partida</button>
+          <button id="start-play" class="big primary">Jogar</button>
+          <button id="start-settings" class="big">Ajustes</button>
+          <button id="start-online" class="big">Jogar online</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="online" class="modal" hidden>
+      <form class="card online" onsubmit="return false">
+        <h2>Jogar online</h2>
+        <p id="online-mode" class="online-note" hidden>
+          Modo de teste: sem o Supabase configurado, a sala só funciona entre abas deste navegador.
+        </p>
+        <label class="online-name">Seu nome <input id="online-name" maxlength="20" placeholder="Como o adversário vai te chamar" autocomplete="off" /></label>
+
+        <div id="online-lobby" class="online-lobby">
+          <button type="button" id="online-create" class="primary big">Criar sala</button>
+          <div class="online-or">ou entre na sala de alguém</div>
+          <div class="join-row">
+            <input id="online-code" maxlength="8" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters" />
+            <button type="button" id="online-join" class="big">Entrar</button>
+          </div>
+        </div>
+
+        <div id="online-room" class="online-room" hidden>
+          <div class="room-label">Código da sala</div>
+          <div id="online-room-code" class="room-code"></div>
+          <button type="button" id="online-copy">Copiar link do convite</button>
+          <p id="online-room-status" class="room-status"></p>
+          <button type="button" id="online-leave" class="danger">Sair da sala</button>
+        </div>
+
+        <p id="online-error" class="online-error" role="alert" hidden></p>
+        <button type="button" id="online-close">Fechar</button>
+      </form>
+    </div>
+
+    <div id="settings" class="modal" hidden>
+      <form class="card settings" onsubmit="return false">
+        <h2>Ajustes</h2>
+        <fieldset class="seg" id="set-theme">
+          <legend>Tema</legend>
+        </fieldset>
+        <div class="names">
+          <label>♔ Brancas <input id="set-white" maxlength="20" placeholder="Nome de quem joga" autocomplete="off" /></label>
+          <label>♚ Pretas <input id="set-black" maxlength="20" placeholder="Nome de quem joga" autocomplete="off" /></label>
+        </div>
+        <fieldset class="seg">
+          <legend>Nível</legend>
+          <label><input type="radio" name="spicy" id="set-spicy-off" /> <span>Leve</span></label>
+          <label><input type="radio" name="spicy" id="set-spicy-on" /> <span>Pesado 🌶️</span></label>
+        </fieldset>
+        <label class="check"><input type="checkbox" id="set-sound" /> Efeitos sonoros</label>
+        <label class="check"><input type="checkbox" id="set-voice" /> Ler as frases em voz alta</label>
+        <label class="check"><input type="checkbox" id="set-flip" /> Girar a câmera a cada turno</label>
+        <label class="check"><input type="checkbox" id="set-idle" /> Provocar quem demora pra jogar</label>
+        <button type="button" id="set-close" class="primary">Pronto</button>
+      </form>
+    </div>
+
+    <div id="overlay" class="modal" hidden>
+      <div class="card">
+        <h2 id="overlay-title"></h2>
+        <p id="overlay-sub"></p>
+        <button id="btn-again" class="primary">Jogar de novo</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
